@@ -1,0 +1,11 @@
+{
+    "mysql": {
+        "host": "10.42.0.1",
+        "port": 33060,
+        "user": "root",
+        "password": "123123",
+        "database": "lock_visitor_manager"
+    },
+    "port": 19191,
+    "lockPort": 19192
+}

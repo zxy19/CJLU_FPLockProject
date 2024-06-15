@@ -1,0 +1,8 @@
+.vscode
+build
+**/node_modules
+**/.vscode
+server/lock/*.crt
+server/lock/*.key
+server/lock/*.srl
+server/lock/*.csr

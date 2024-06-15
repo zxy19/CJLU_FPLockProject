@@ -1,0 +1,12 @@
+ auto t = finger::CMD_match();
+    Serial.printf("%d\r\n", t.error);
+    for(int i=0;i<50;i++){
+        auto res = finger::CMD_getMatchResult();
+        Serial.printf("F:%d ==> %d %d %d\r\n",res.error,res.id,res.result,res.score);
+        if(res.ok())break;
+        if(res.error != 0x04){
+            Serial.println("error");
+            break;
+        }
+        delay(400);
+    }

@@ -1,0 +1,23 @@
+{
+  "name": "lock-visitor-manager-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "debug": "ts-node index.ts",
+    "test": "ts-node test.ts",
+    "cert":"ts-node ./generateCert.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.26",
+    "@types/node": "^20.14.2",
+    "@types/ws": "^8.5.10",
+    "ts-node": "^10.9.2"
+  }
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>\xE9\x85\x8D\xE7\xBD\x91\xE9\xA1\xB5</title>
+  </head>
+  <body>
+    <style>
+      input.value.changed {
+        background-color: #ffe0b2;
+      }
+      select,
+      input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        outline: 0;
+        padding: 10px 8px;
+        box-shadow: 0 0 2px 0px #4c4c4c;
+        border-radius: 5px;
+        border: gray 1px solid;
+      }
+      select:focus,
+      input:focus {
+        box-shadow: 0 0 2px 0px #2196f3;
+      }
+      .btn {
+        border: gray 1px solid;
+        padding: 6px 10px 10px 10px;
+        border-radius: 5px;
+        background-color: #2196f3;
+        color: white;
+        text-decoration: none;
+        margin: 5px;
+        cursor: pointer;
+        display: inline-block;
+      }
+
+      .btn:hover {
+        background-color: #0277bd;
+      }
+    </style>
+    <div id="i"></div>
+    <div><h2>WiFi</h2></div>
+    <div>
+      <b>SSID:</b>
+      <select id="s"></select>
+    </div>
+    <div><b>\xE5\xAF\x86\xE7\xA0\x81:</b><input id="p" type="password" /></div>
+    <div>
+      <a class="btn" onclick="s()" id="b">\xE8\xBF\x9E\xE6\x8E\xA5</a>
+      <a class="btn" onclick="c()" id="c">\xE6\x89\xAB\xE6\x8F\x8F</a>
+    </div>
+    <div><h2>\xE4\xBA\x91\xE6\x9C\x8D\xE5\x8A\xA1</h2></div>
+    <div>
+      <b>\xE5\xAF\x86\xE7\xA0\x81:</b>
+      <input id="clp" type="password" />
+    </div>
+    <div>
+      <a class="btn" onclick="spw()" id="spw">
+        \xE8\xAE\xBE\xE7\xBD\xAE\xE5\xAF\x86\xE7\xA0\x81
+      </a>
+    </div>
+    <div><h2>\xE5\x85\xB6\xE4\xBB\x96</h2></div>
+    <div>
+      <a class="btn" onclick="op()" id="op">\xE5\xBC\x80\xE9\x97\xA8</a>
+      <a class="btn" onclick="ad()" id="ad">
+        \xE6\xB7\xBB\xE5\x8A\xA0\xE6\x8C\x87\xE7\xBA\xB9
+      </a>
+      <a class="btn" onclick="sop()" id="sop">
+        \xE8\xB0\x83\xE8\x8A\x82\xE8\x88\xB5\xE6\x9C\xBA
+      </a>
+    </div>
+    <script>
+      var _i = (n) => document.getElementById(n);
+      var i = (n) => _i(n).value;
+      var s = (e) => {
+        _i("b").innerHTML = "...";
+        l = false;
+        fetch("/network", {
+          method: "POST",
+          body: i("s") + ":::" + i("p"),
+        }).then(v);
+      };
+      var l = false;
+      var v = () => {
+        fetch("/networkStatus")
+          .then((d) => d.text())
+          .then((d) => {
+            if (d.indexOf("success") != -1) {
+              alert("ok");
+              location.href = "/";
+              l = true;
+            } else if (d.indexOf("fail") != -1) {
+              alert("fail");
+              l = true;
+            }
+          })
+          .finally(() => {
+            if (!l) setTimeout(v, 1000);
+            else _i("b").innerHTML = "Send";
+          });
+      };
+      var c = () => {
+        _i("c").innerHTML = "...";
+
+        cs()
+          .then(
+            (d) =>
+              (_i("s").innerHTML = d.map(
+                (d) => `<option value="${d}">${d}</option>`
+              ))
+          )
+          .finally(() => (_i("c").innerHTML = "Scan"));
+      };
+      var cs = async () => {
+        while (true) {
+          let t = await fetch("/scan").then((d) => d.json());
+          if (t.finish) return t.result;
+          await new Promise((r) => setTimeout(r, 500));
+        }
+      };
+      var g = (n) => {
+        var r = window.location.search
+          .substr(1)
+          .match(new RegExp("(^|&)" + n + "=([^&]*)(&|$)"));
+        if (r != null) return unescape(r[2]);
+        return null;
+      };
+      if (g("ssid")) {
+        _i(
+          "i"
+        ).innerHTML = `\xE5\xBD\x93\xE5\x89\x8D\xE8\xBF\x9E\xE6\x8E\xA5\xE7\x9A\x84\xE6\x97\xA0\xE7\xBA\xBF\xE7\xBD\x91\xE7\xBB\x9C\xEF\xBC\x9A${g(
+          "ssid"
+        )}`;
+      }
+      var adl = false;
+      var ad = async () => {
+        if (adl) return;
+        let _ = _i("ad").innerHTML;
+        _i("ad").innerHTML = "...";
+        adl = true;
+
+        while (true) {
+          let t = await fetch("/ad").then((d) => d.json());
+          if (t.finish) {
+            alert(t.result);
+            break;
+          }
+          _i("ad").innerHTML = t.result;
+          await new Promise((r) => setTimeout(r, 500));
+        }
+        _i("ad").innerHTML = _;
+        adl = false;
+      };
+      var op = () => {
+        fetch("/op", {
+          method: "GET",
+        })
+          .then((e) => e.text())
+          .then((ret) => alert(ret == "ok" ? "ok" : "fail"));
+      };
+      var spw = (e) => {
+        l = false;
+        fetch("/setpw", {
+          method: "POST",
+          body: i("clp"),
+        })
+          .then((t) => t.text())
+          .then(alert);
+      };
+      var sop = async () => {
+        let _ = _i("sop").innerHTML;
+        _i("sop").innerHTML = "...";
+        while(1){
+          let cv = await fetch("/servo_open_value").then((d) => d.text());
+          let nv = prompt("\xE5\xBD\x93\xE5\x89\x8D\xE5\x80\xBC\x3A"+cv);
+
+          if(!nv)break;
+          if(nv==cv)continue;
+          await fetch("/set_servo_open_value",{method:"POST",body:nv});
+        }
+        _i("sop").innerHTML = _;
+      };
+    </script>
+  </body>
+</html>
